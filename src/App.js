@@ -4,6 +4,7 @@ import { Route, Switch } from 'react-router-dom';
 import Navbar from './Components/Navbar/Navbar';
 import MainPage from './Containers/MainPageContainer/MainPage';
 import NotFound from './Components/404NotFound/NotFound';
+import Login from './Containers/Login/Login';
 
 import './App.css';
 
@@ -12,6 +13,7 @@ const App = () => {
     <div className='App-container'>
       <Navbar />
       <Switch>
+        <Route path='/login' exact component={Login} />
         <Route path='/' exact component={MainPage} />
         <Route component={NotFound} />
       </Switch>
