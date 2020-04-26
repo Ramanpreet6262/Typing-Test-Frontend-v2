@@ -1,4 +1,4 @@
-# Typing Test
+# Typing Test Frontend v2
 
 A Typing Web App made using ReactJS to test your typing skills. It is a 1 min game and displays statistics including typing speed, accuracy, etc.
 
