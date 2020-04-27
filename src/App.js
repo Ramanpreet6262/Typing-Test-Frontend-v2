@@ -7,6 +7,7 @@ import MainPage from './Containers/MainPageContainer/MainPage';
 import NotFound from './Components/404NotFound/NotFound';
 import Login from './Containers/Login/Login';
 import Loader from './Components/Loader/Loader';
+import Signup from './Containers/Signup/Signup';
 import { AppContext } from './libs/contextLib';
 import { onError } from './libs/errorLib';
 
@@ -50,6 +51,7 @@ const App = () => {
         <AppContext.Provider value={{ isAuthenticated, userHasAuthenticated }}>
           <Switch>
             <Route path='/login' exact component={Login} />
+            <Route path='/signup' exact component={Signup} />
             <Route path='/' exact component={MainPage} />
             <Route component={NotFound} />
           </Switch>
