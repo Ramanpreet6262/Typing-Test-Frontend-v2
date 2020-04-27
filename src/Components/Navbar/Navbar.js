@@ -4,7 +4,7 @@ import { Nav, Navbar, NavItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import './Navbar.css';
 
-const navbar = () => {
+const navbar = props => {
   return (
     <div className='navigation container'>
       <Navbar fluid collapseOnSelect>
@@ -16,12 +16,18 @@ const navbar = () => {
         </Navbar.Header>
         <Navbar.Collapse>
           <Nav pullRight>
-            <LinkContainer to='/signup'>
-              <NavItem>Signup</NavItem>
-            </LinkContainer>
-            <LinkContainer to='/login'>
-              <NavItem>Login</NavItem>
-            </LinkContainer>
+            {props.isAuthenticated ? (
+              <NavItem onClick={props.handleLogout}>Logout</NavItem>
+            ) : (
+              <>
+                <LinkContainer to='/signup'>
+                  <NavItem>Signup</NavItem>
+                </LinkContainer>
+                <LinkContainer to='/login'>
+                  <NavItem>Login</NavItem>
+                </LinkContainer>
+              </>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Navbar>
