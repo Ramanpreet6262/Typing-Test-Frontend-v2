@@ -31,6 +31,7 @@ const Login = () => {
       history.push('/');
     } catch (e) {
       onError(e);
+      // console.log(e);
       setLoading(false);
     }
   }
