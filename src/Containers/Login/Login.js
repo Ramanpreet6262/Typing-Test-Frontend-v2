@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
 import { Auth } from 'aws-amplify';
 import { useAppContext } from '../../libs/contextLib';
+import { onError } from '../../libs/errorLib';
 import Loader from '../../Components/Loader/Loader';
 import './Login.css';
 
@@ -27,7 +28,7 @@ const Login = () => {
       userHasAuthenticated(true);
       history.push('/');
     } catch (e) {
-      alert(e.message);
+      onError(e);
       setLoading(false);
     }
   }

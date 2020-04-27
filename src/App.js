@@ -8,6 +8,7 @@ import NotFound from './Components/404NotFound/NotFound';
 import Login from './Containers/Login/Login';
 import Loader from './Components/Loader/Loader';
 import { AppContext } from './libs/contextLib';
+import { onError } from './libs/errorLib';
 
 import './App.css';
 
@@ -27,7 +28,7 @@ const App = () => {
       userHasAuthenticated(true);
     } catch (e) {
       if (e !== 'No current user') {
-        alert(e);
+        onError(e);
       }
     }
 
