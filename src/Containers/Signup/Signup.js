@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   Button,
-  HelpBlock,
+  FormText,
   FormGroup,
   FormControl,
-  ControlLabel
+  FormLabel
 } from 'react-bootstrap';
 import Loader from '../../Components/Loader/Loader';
 import { Auth } from 'aws-amplify';
@@ -14,7 +14,7 @@ import { useFormFields } from '../../libs/hooksLib';
 import { onError } from '../../libs/errorLib';
 import './Signup.css';
 
-const Signup = () => {
+const Signup = props => {
   const [fields, handleFieldChange] = useFormFields({
     email: '',
     password: '',
@@ -25,6 +25,14 @@ const Signup = () => {
   const [newUser, setNewUser] = useState(null);
   const { userHasAuthenticated } = useAppContext();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (props.location.state !== undefined) {
+      if (props.location.state.user) {
+        setNewUser(props.location.state.user);
+      }
+    }
+  }, [props.location.state]);
 
   const validateForm = () => {
     return (
@@ -49,8 +57,13 @@ const Signup = () => {
       setLoading(false);
       setNewUser(newUser);
     } catch (e) {
-      // console.log(e);
-      onError(e);
+      if (e.code === 'UsernameExistsException') {
+        let err = e;
+        err.message = e.message + ' Please Login instead!';
+        onError(err);
+      } else {
+        onError(e);
+      }
       setLoading(false);
     }
   }
@@ -72,20 +85,20 @@ const Signup = () => {
   function renderConfirmationForm() {
     return (
       <form onSubmit={handleConfirmationSubmit}>
-        <FormGroup controlId='confirmationCode' bsSize='large'>
-          <ControlLabel>Confirmation Code</ControlLabel>
+        <FormGroup controlId='confirmationCode' size='lg'>
+          <FormLabel>Confirmation Code</FormLabel>
           <FormControl
             autoFocus
             type='tel'
             onChange={handleFieldChange}
             value={fields.confirmationCode}
           />
-          <HelpBlock>Please check your email for the code.</HelpBlock>
+          <FormText>Please check your email for the code.</FormText>
         </FormGroup>
         <Button
           block
           type='submit'
-          bsSize='large'
+          size='lg'
           disabled={!validateConfirmationForm()}
         >
           Verify
@@ -97,8 +110,8 @@ const Signup = () => {
   function renderForm() {
     return (
       <form onSubmit={handleSubmit}>
-        <FormGroup controlId='email' bsSize='large'>
-          <ControlLabel>Email</ControlLabel>
+        <FormGroup controlId='email' size='lg'>
+          <FormLabel>Email</FormLabel>
           <FormControl
             autoFocus
             type='email'
@@ -106,23 +119,23 @@ const Signup = () => {
             onChange={handleFieldChange}
           />
         </FormGroup>
-        <FormGroup controlId='password' bsSize='large'>
-          <ControlLabel>Password</ControlLabel>
+        <FormGroup controlId='password' size='lg'>
+          <FormLabel>Password</FormLabel>
           <FormControl
             type='password'
             value={fields.password}
             onChange={handleFieldChange}
           />
         </FormGroup>
-        <FormGroup controlId='confirmPassword' bsSize='large'>
-          <ControlLabel>Confirm Password</ControlLabel>
+        <FormGroup controlId='confirmPassword' size='lg'>
+          <FormLabel>Confirm Password</FormLabel>
           <FormControl
             type='password'
             onChange={handleFieldChange}
             value={fields.confirmPassword}
           />
         </FormGroup>
-        <Button block type='submit' bsSize='large' disabled={!validateForm()}>
+        <Button block type='submit' size='lg' disabled={!validateForm()}>
           Signup
         </Button>
       </form>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
+import { Button, FormGroup, FormControl, FormLabel } from 'react-bootstrap';
 import { Auth } from 'aws-amplify';
 import { useAppContext } from '../../libs/contextLib';
 import { onError } from '../../libs/errorLib';
@@ -30,9 +30,29 @@ const Login = () => {
       userHasAuthenticated(true);
       history.push('/');
     } catch (e) {
-      onError(e);
-      // console.log(e);
-      setLoading(false);
+      if (e.code === 'UserNotConfirmedException') {
+        let err = e;
+        err.message =
+          e.message + ' Please check your email for the new confirmation code!';
+        onError(err);
+        try {
+          await Auth.resendSignUp(fields.email);
+          const user = {
+            email: fields.email
+          };
+          setLoading(false);
+          history.push({
+            pathname: '/signup',
+            state: { user: user }
+          });
+        } catch (e) {
+          onError(e);
+          setLoading(false);
+        }
+      } else {
+        onError(e);
+        setLoading(false);
+      }
     }
   }
 
@@ -42,8 +62,8 @@ const Login = () => {
     return (
       <div className='Login'>
         <form onSubmit={handleSubmit}>
-          <FormGroup controlId='email' bsSize='large'>
-            <ControlLabel>Email</ControlLabel>
+          <FormGroup controlId='email' size='lg'>
+            <FormLabel>Email</FormLabel>
             <FormControl
               autoFocus
               type='email'
@@ -51,15 +71,15 @@ const Login = () => {
               onChange={handleFieldChange}
             />
           </FormGroup>
-          <FormGroup controlId='password' bsSize='large'>
-            <ControlLabel>Password</ControlLabel>
+          <FormGroup controlId='password' size='lg'>
+            <FormLabel>Password</FormLabel>
             <FormControl
               value={fields.password}
               onChange={handleFieldChange}
               type='password'
             />
           </FormGroup>
-          <Button block bsSize='large' disabled={!validateForm()} type='submit'>
+          <Button block size='lg' disabled={!validateForm()} type='submit'>
             Login
           </Button>
         </form>

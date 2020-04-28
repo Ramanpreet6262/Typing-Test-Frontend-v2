@@ -1,31 +1,32 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Nav, Navbar, NavItem } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
 import './Navbar.css';
 
 const navbar = props => {
   return (
-    <div className='navigation container'>
-      <Navbar fluid collapseOnSelect>
-        <Navbar.Header>
-          <Navbar.Brand>
-            <Link to='/'>Typing Test</Link>
-          </Navbar.Brand>
-          <Navbar.Toggle />
-        </Navbar.Header>
+    <div className='navigation'>
+      <Navbar bg='dark' variant='dark' expand='lg'>
+        <Navbar.Brand as={Link} to='/'>
+          Typing Test
+        </Navbar.Brand>
+        <Navbar.Toggle />
         <Navbar.Collapse>
-          <Nav pullRight>
+          <Nav className='ml-auto'>
             {props.isAuthenticated ? (
               <NavItem onClick={props.handleLogout}>Logout</NavItem>
             ) : (
               <>
-                <LinkContainer to='/signup'>
-                  <NavItem>Signup</NavItem>
-                </LinkContainer>
-                <LinkContainer to='/login'>
-                  <NavItem>Login</NavItem>
-                </LinkContainer>
+                <NavItem>
+                  <Nav.Link as={Link} to='/signup'>
+                    Signup
+                  </Nav.Link>
+                </NavItem>
+                <NavItem>
+                  <Nav.Link as={Link} to='/login'>
+                    Login
+                  </Nav.Link>
+                </NavItem>
               </>
             )}
           </Nav>

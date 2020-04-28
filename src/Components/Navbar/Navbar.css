@@ -1,3 +1,7 @@
 .navigation .navbar-brand {
     font-weight: bold;
 }
+
+.navigation .nav-item {
+    font-weight: bold;
+}
