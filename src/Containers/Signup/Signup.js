@@ -25,11 +25,13 @@ const Signup = props => {
   const [newUser, setNewUser] = useState(null);
   const { userHasAuthenticated } = useAppContext();
   const [loading, setLoading] = useState(false);
+  const [directConfirm, setDirectConfirm] = useState(false);
 
   useEffect(() => {
     if (props.location.state !== undefined) {
       if (props.location.state.user) {
         setNewUser(props.location.state.user);
+        setDirectConfirm(true);
       }
     }
   }, [props.location.state]);
@@ -72,10 +74,24 @@ const Signup = props => {
     event.preventDefault();
     setLoading(true);
     try {
-      await Auth.confirmSignUp(fields.email, fields.confirmationCode);
-      await Auth.signIn(fields.email, fields.password);
-      userHasAuthenticated(true);
-      history.push('/');
+      if (directConfirm) {
+        await Auth.confirmSignUp(
+          props.location.state.user.email,
+          fields.confirmationCode
+        );
+        await Auth.signIn(
+          props.location.state.user.email,
+          props.location.state.user.password
+        );
+        userHasAuthenticated(true);
+        setDirectConfirm(false);
+        history.push('/');
+      } else {
+        await Auth.confirmSignUp(fields.email, fields.confirmationCode);
+        await Auth.signIn(fields.email, fields.password);
+        userHasAuthenticated(true);
+        history.push('/');
+      }
     } catch (e) {
       onError(e);
       setLoading(false);

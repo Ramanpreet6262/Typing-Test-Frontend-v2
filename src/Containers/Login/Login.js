@@ -38,7 +38,8 @@ const Login = () => {
         try {
           await Auth.resendSignUp(fields.email);
           const user = {
-            email: fields.email
+            email: fields.email,
+            password: fields.password
           };
           setLoading(false);
           history.push({

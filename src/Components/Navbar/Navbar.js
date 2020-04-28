@@ -14,7 +14,9 @@ const navbar = props => {
         <Navbar.Collapse>
           <Nav className='ml-auto'>
             {props.isAuthenticated ? (
-              <NavItem onClick={props.handleLogout}>Logout</NavItem>
+              <NavItem className='logout-link' onClick={props.handleLogout}>
+                Logout
+              </NavItem>
             ) : (
               <>
                 <NavItem>
