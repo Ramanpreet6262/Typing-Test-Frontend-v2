@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Button, FormGroup, FormControl, FormLabel } from 'react-bootstrap';
 import { Auth } from 'aws-amplify';
 import { useAppContext } from '../../libs/contextLib';
@@ -28,7 +28,7 @@ const Login = () => {
       await Auth.signIn(fields.email, fields.password);
       setLoading(false);
       userHasAuthenticated(true);
-      history.push('/');
+      // history.push('/');
     } catch (e) {
       if (e.code === 'UserNotConfirmedException') {
         let err = e;
@@ -80,6 +80,7 @@ const Login = () => {
               type='password'
             />
           </FormGroup>
+          <Link to='/login/reset'>Forgot password?</Link>
           <Button block size='lg' disabled={!validateForm()} type='submit'>
             Login
           </Button>

@@ -2,12 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Route, Switch, useHistory } from 'react-router-dom';
 import { Auth } from 'aws-amplify';
 
+import AuthenticatedRoute from './Containers/RouteAuth/AuthenticatedRoute';
+import UnauthenticatedRoute from './Containers/RouteAuth/UnauthenticatedRoute';
+
 import Navbar from './Components/Navbar/Navbar';
 import MainPage from './Containers/MainPageContainer/MainPage';
 import NotFound from './Components/404NotFound/NotFound';
 import Login from './Containers/Login/Login';
 import Loader from './Components/Loader/Loader';
 import Signup from './Containers/Signup/Signup';
+import ResetPassword from './Containers/Forget&ResetPassword/ResetPassword';
+import Profile from './Containers/Profile/Profile';
+import ChangePassword from './Containers/ChangePassword/ChangePassword';
 import { AppContext } from './libs/contextLib';
 import { onError } from './libs/errorLib';
 
@@ -50,8 +56,19 @@ const App = () => {
         <Navbar isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
         <AppContext.Provider value={{ isAuthenticated, userHasAuthenticated }}>
           <Switch>
-            <Route path='/login' exact component={Login} />
-            <Route path='/signup' exact component={Signup} />
+            <UnauthenticatedRoute path='/login' exact component={Login} />
+            <UnauthenticatedRoute
+              path='/login/reset'
+              exact
+              component={ResetPassword}
+            />
+            <UnauthenticatedRoute path='/signup' exact component={Signup} />
+            <AuthenticatedRoute path='/profile' exact component={Profile} />
+            <AuthenticatedRoute
+              path='/profile/password'
+              exact
+              component={ChangePassword}
+            />
             <Route path='/' exact component={MainPage} />
             <Route component={NotFound} />
           </Switch>
