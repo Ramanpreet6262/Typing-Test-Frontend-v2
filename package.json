@@ -10,6 +10,7 @@
     "aws-amplify": "^3.0.8",
     "bootstrap": "^4.4.1",
     "faker": "^4.1.0",
+    "firebase": "^7.14.2",
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.1",
     "react-dom": "^16.13.1",

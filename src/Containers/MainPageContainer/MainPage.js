@@ -6,6 +6,10 @@ import currentTime from '../../utils/time';
 import ResultModal from '../../Components/Modal/Modal';
 import UIfx from 'uifx';
 import keyPressAudio from '../../keypress.mp3';
+import Loader from '../../Components/Loader/Loader';
+import { db } from '../../firebaseConfig';
+import { Auth } from 'aws-amplify';
+import { useAppContext } from '../../libs/contextLib';
 
 // Passing keypress audio to uifx to use it to play on particular events..
 const keyAudio = new UIfx(keyPressAudio);
@@ -32,9 +36,12 @@ const MainPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [wordCount, setWordCount] = useState(0);
   const [isWordCorrect, setIsWordCorrect] = useState(true);
-  const [timer, setTimer] = useState(60);
+  // const [timer, setTimer] = useState(60);
+  const [timer, setTimer] = useState(10);
   const [isTimeFinished, setIsTimeFinished] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { isAuthenticated } = useAppContext();
 
   // Passing a callback method to imported useKeyPress custom hook method
   // And key parameter is passed from this hook on keypress to this callback method
@@ -256,16 +263,108 @@ const MainPage = () => {
   };
 
   // Method to show result modal after time finishes
-  const showResult = () => {
+  // const showResult = () => {
+  //   setIsTimeFinished(true);
+  //   setShowResultModal(true);
+  // };
+
+  async function showResult() {
     setIsTimeFinished(true);
     setShowResultModal(true);
-  };
+
+    // let accuracy =
+    //   totalTypedChars === 0
+    //     ? 0
+    //     : ((correctTypedChars * 100) / totalTypedChars).toFixed(2);
+    // let wpm = (wordCount / getTimeDur()).toFixed(0);
+    // let cpm = (correctTypedChars / getTimeDur()).toFixed(0);
+    // console.log(wordCount);
+
+    // console.log(`accuracy, ${accuracy}`);
+    // console.log(`wpm, ${wpm}`);
+    // console.log(`cpm, ${cpm}`);
+
+    // const currentUser = await Auth.currentAuthenticatedUser();
+    // const userEmail = currentUser.attributes.email;
+    // const userDocRef = db.collection('users').doc(userEmail);
+
+    // let userDoc = userDocRef
+    //   .get()
+    //   .then(doc => {
+    //     if (doc.exists) {
+    //       const data = doc.data();
+    //       console.log(data);
+    //     } else {
+    //       console.log('No such document!');
+    //     }
+    //   })
+    //   .catch(err => {
+    //     alert(
+    //       `Error occured while fetching recent user data. Please refresh page!!`
+    //     );
+    //   });
+  }
 
   // Method to close result modal on click outside of it
-  const handleModalClose = () => {
+  // const handleModalClose = () => {
+  async function handleModalClose() {
     setShowResultModal(false);
+
+    if (isAuthenticated) {
+      setLoading(true);
+
+      let accuracy =
+        totalTypedChars === 0
+          ? 0
+          : ((correctTypedChars * 100) / totalTypedChars).toFixed(2);
+      let wpm = (wordCount / getTimeDur()).toFixed(0);
+      let cpm = (correctTypedChars / getTimeDur()).toFixed(0);
+      let testData = {
+        accuracy: accuracy,
+        cpm: cpm,
+        wpm: wpm,
+        addedAt: new Date()
+      };
+
+      const currentUser = await Auth.currentAuthenticatedUser();
+      const userEmail = currentUser.attributes.email;
+      const userDocRef = db.collection('users').doc(userEmail);
+
+      let userDoc = userDocRef
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            const data = doc.data();
+            console.log(data);
+            data.tests.push(testData);
+            if (cpm > data.maxCpm) {
+              data.maxCpm = cpm;
+            }
+            // data.addedAt = new Date();
+            const setDoc = userDocRef.set(data);
+          } else {
+            console.log('No such document!');
+            let testArr = [];
+            testArr.push(testData);
+            const data = {
+              maxCpm: cpm,
+              tests: testArr
+              // addedAt: new Date()
+            };
+            const setDoc = userDocRef.set(data);
+          }
+        })
+        .catch(err => {
+          alert(
+            `Error occured while fetching recent user data. Please refresh page!!`
+          );
+        });
+
+      setLoading(false);
+    }
+
     resetSettings();
-  };
+  }
 
   // Method to reset all settings to allow user to play again
   const resetSettings = () => {
@@ -285,7 +384,8 @@ const MainPage = () => {
     setCurrentIndex(0);
     setWordCount(0);
     setIsWordCorrect(true);
-    setTimer(60);
+    // setTimer(60);
+    setTimer(10);
     setIsTimeFinished(false);
   };
 
@@ -294,7 +394,8 @@ const MainPage = () => {
     if (!isTimeFinished) {
       return (currentTime() - startTime) / 60000.0;
     } else {
-      return 60 / 60.0;
+      // return 60 / 60.0;
+      return 10 / 10.0;
     }
   };
 
@@ -342,66 +443,70 @@ const MainPage = () => {
     finalArr.push(spanTag);
   }
 
-  return (
-    <div className='App'>
-      <header className='App-header'>
-        <h3 className='timer-block'>
-          Timer:{' '}
-          {timer < 10 ? (
-            <span className='red-timer'>{timer}sec</span>
-          ) : (
-            timer + 'sec'
-          )}
-        </h3>
-        <p className='Character'>
-          {finalArr.reverse()}
-          <span className='Character-current'>{currentChar}</span>
-          <span>{incomingChars.substr(0, 20)}</span>
-        </p>
-        <div className='parameters-div'>
-          <h3>
-            Errors: {totalTypedChars - correctTypedChars}/
-            <span className='totalChars'>{totalTypedChars}</span> | Accuracy:{' '}
-            {totalTypedChars === 0
-              ? 0
-              : ((correctTypedChars * 100) / totalTypedChars).toFixed(2)}
-            %
+  if (loading) {
+    return <Loader />;
+  } else {
+    return (
+      <div className='App'>
+        <header className='App-header'>
+          <h3 className='timer-block'>
+            Timer:{' '}
+            {timer < 10 ? (
+              <span className='red-timer'>{timer}sec</span>
+            ) : (
+              timer + 'sec'
+            )}
           </h3>
-          <h3>
-            Speed=> CPM:{' '}
-            {startTime ? (correctTypedChars / getTimeDur()).toFixed(0) : 0} |
-            WPM: {startTime ? (wordCount / getTimeDur()).toFixed(0) : 0}
-          </h3>
-        </div>
-      </header>
-      <ResultModal open={showResultModal} handleClose={handleModalClose}>
-        <h1 className='result-heading'>
-          Your typing speed is{' '}
-          <span className='result-wpm'>
-            {startTime ? (wordCount / getTimeDur()).toFixed(0) : 0}WPM
-          </span>
-        </h1>
-        <div className='result-typingspeed'>
-          <p className='typing-speed-heading'>Typing Speed</p>
-          <p className='typing-speed-content'>
-            {startTime ? (correctTypedChars / getTimeDur()).toFixed(0) : 0}
-            <span className='unfocused-content'>CPM</span> |{' '}
-            {startTime ? (wordCount / getTimeDur()).toFixed(0) : 0}
-            <span className='unfocused-content'>WPM</span>
+          <p className='Character'>
+            {finalArr.reverse()}
+            <span className='Character-current'>{currentChar}</span>
+            <span>{incomingChars.substr(0, 20)}</span>
           </p>
-        </div>
-        <div className='result-accuracy'>
-          <p className='accuracy-heading'>Accuracy</p>
-          <p className='accuracy-content'>
-            {totalTypedChars === 0
-              ? 0
-              : ((correctTypedChars * 100) / totalTypedChars).toFixed(2)}
-            <span className='unfocused-content'>%</span>
-          </p>
-        </div>
-      </ResultModal>
-    </div>
-  );
+          <div className='parameters-div'>
+            <h3>
+              Errors: {totalTypedChars - correctTypedChars}/
+              <span className='totalChars'>{totalTypedChars}</span> | Accuracy:{' '}
+              {totalTypedChars === 0
+                ? 0
+                : ((correctTypedChars * 100) / totalTypedChars).toFixed(2)}
+              %
+            </h3>
+            <h3>
+              Speed=> CPM:{' '}
+              {startTime ? (correctTypedChars / getTimeDur()).toFixed(0) : 0} |
+              WPM: {startTime ? (wordCount / getTimeDur()).toFixed(0) : 0}
+            </h3>
+          </div>
+        </header>
+        <ResultModal open={showResultModal} handleClose={handleModalClose}>
+          <h1 className='result-heading'>
+            Your typing speed is{' '}
+            <span className='result-wpm'>
+              {startTime ? (wordCount / getTimeDur()).toFixed(0) : 0}WPM
+            </span>
+          </h1>
+          <div className='result-typingspeed'>
+            <p className='typing-speed-heading'>Typing Speed</p>
+            <p className='typing-speed-content'>
+              {startTime ? (correctTypedChars / getTimeDur()).toFixed(0) : 0}
+              <span className='unfocused-content'>CPM</span> |{' '}
+              {startTime ? (wordCount / getTimeDur()).toFixed(0) : 0}
+              <span className='unfocused-content'>WPM</span>
+            </p>
+          </div>
+          <div className='result-accuracy'>
+            <p className='accuracy-heading'>Accuracy</p>
+            <p className='accuracy-content'>
+              {totalTypedChars === 0
+                ? 0
+                : ((correctTypedChars * 100) / totalTypedChars).toFixed(2)}
+              <span className='unfocused-content'>%</span>
+            </p>
+          </div>
+        </ResultModal>
+      </div>
+    );
+  }
 };
 
 export default MainPage;
