@@ -36,8 +36,8 @@ const MainPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [wordCount, setWordCount] = useState(0);
   const [isWordCorrect, setIsWordCorrect] = useState(true);
-  // const [timer, setTimer] = useState(60);
-  const [timer, setTimer] = useState(10);
+  const [timer, setTimer] = useState(60);
+  // const [timer, setTimer] = useState(10);
   const [isTimeFinished, setIsTimeFinished] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -384,8 +384,8 @@ const MainPage = () => {
     setCurrentIndex(0);
     setWordCount(0);
     setIsWordCorrect(true);
-    // setTimer(60);
-    setTimer(10);
+    setTimer(60);
+    // setTimer(10);
     setIsTimeFinished(false);
   };
 
@@ -394,8 +394,8 @@ const MainPage = () => {
     if (!isTimeFinished) {
       return (currentTime() - startTime) / 60000.0;
     } else {
-      // return 60 / 60.0;
-      return 10 / 10.0;
+      return 60 / 60.0;
+      // return 10 / 10.0;
     }
   };
 
