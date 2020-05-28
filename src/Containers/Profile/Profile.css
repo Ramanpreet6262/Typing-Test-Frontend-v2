@@ -8,4 +8,15 @@
 
 .change-pass-btn {
     margin-top: 20px;
+    margin-bottom: 135px;
+}
+
+h3 {
+    margin-bottom: 2rem !important;
+}
+
+h1 {
+    margin-bottom: 6rem !important;
+    color: orange;
+    font-weight: bold;
 }
