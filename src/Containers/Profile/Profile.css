@@ -8,15 +8,77 @@
 
 .change-pass-btn {
     margin-top: 20px;
-    margin-bottom: 135px;
+    margin-bottom: 30px;
 }
 
-h3 {
+.recent {
     margin-bottom: 2rem !important;
+    margin-left: -10%;
 }
 
 h1 {
-    margin-bottom: 6rem !important;
+    margin-bottom: 4rem !important;
     color: orange;
     font-weight: bold;
+}
+
+/* 
+.Profile {
+    overflow: auto;
+} */
+
+.left-bar {
+    margin-top: 12%;
+    width: 30%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.right-bar {
+    margin-top: 12%;
+    width: 70%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.statsTable {
+    width: 50%;
+    margin-left: 20%;
+}
+
+.graph {
+    margin-left: 25%;
+}
+
+.profile-card {
+    box-shadow: 5px 10px 8px rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    width: 85%;
+    margin-left: 10%;
+    margin-bottom: 50px;
+    padding: 30px;
+}
+
+.profile-pic {
+    margin-top: 10%;
+    width: 35%;
+    height: 45%;
+}
+
+.username {
+    margin-top: 30px;
+}
+
+.tests-taken {
+    padding: 30px;
+    border: 0.3px solid rgba(0, 0, 0, 0.2);
+    width: 80%;
+    margin-left: 10%;
+    color: orangered;
 }
