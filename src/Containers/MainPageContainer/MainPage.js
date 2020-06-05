@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './MainPage.css';
-import generateWords from '../../utils/generateWords';
+// import generateWords from '../../utils/generateWords';
 import useKeyPress from '../../hooks/useKeyPress';
 import currentTime from '../../utils/time';
 import ResultModal from '../../Components/Modal/Modal';
@@ -10,20 +10,23 @@ import Loader from '../../Components/Loader/Loader';
 import { db } from '../../firebaseConfig';
 import { Auth } from 'aws-amplify';
 import { useAppContext } from '../../libs/contextLib';
+import axios from '../../utils/axiosInstance';
 
 // Passing keypress audio to uifx to use it to play on particular events..
 const keyAudio = new UIfx(keyPressAudio);
 
 // Generating random words initially
-const words = generateWords();
+// const words = generateWords();
 
 const MainPage = () => {
   // timeInterval variable to use in setInterval and clearInterval
   let timeInterval = null;
 
   // various state variables to use in logic for our app
-  const [currentChar, setCurrentChar] = useState(words.charAt(0));
-  const [incomingChars, setIncomingChars] = useState(words.substr(1));
+  // const [currentChar, setCurrentChar] = useState(words.charAt(0));
+  // const [incomingChars, setIncomingChars] = useState(words.substr(1));
+  const [currentChar, setCurrentChar] = useState('');
+  const [incomingChars, setIncomingChars] = useState('');
   const [wordsArray, setWordsArray] = useState([]);
   const [currentObj, setCurrentObj] = useState({
     strTyped: '',
@@ -238,6 +241,37 @@ const MainPage = () => {
     }
   });
 
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get('/words')
+      .then(resp => {
+        // console.log(resp);
+        setCurrentChar(resp.data.charAt(0));
+        setIncomingChars(resp.data.substr(1));
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }, []);
+
+  const generateWords = () => {
+    let words = '';
+    axios
+      .get('/words')
+      .then(resp => {
+        // console.log(resp);
+        words = resp.data;
+        // console.log('words');
+        // console.log(words);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    return words;
+  };
+
   // To clear setInterval on component unmount
   useEffect(() => {
     return () => {
@@ -368,25 +402,58 @@ const MainPage = () => {
 
   // Method to reset all settings to allow user to play again
   const resetSettings = () => {
-    const newWords = generateWords();
-    timeInterval = null;
-    setCurrentChar(newWords.charAt(0));
-    setIncomingChars(newWords.substr(1));
-    setWordsArray([]);
-    setCurrentObj({
-      strTyped: '',
-      hasErr: false
-    });
-    setTotalTypedChars(0);
-    setCorrectTypedChars(0);
-    setStartTime(null);
-    setIncorrectWords({});
-    setCurrentIndex(0);
-    setWordCount(0);
-    setIsWordCorrect(true);
-    setTimer(60);
-    // setTimer(10);
-    setIsTimeFinished(false);
+    setLoading(true);
+
+    axios
+      .get('/words')
+      .then(resp => {
+        // console.log(resp);
+        timeInterval = null;
+
+        setCurrentChar(resp.data.charAt(0));
+        setIncomingChars(resp.data.substr(1));
+        setWordsArray([]);
+        setCurrentObj({
+          strTyped: '',
+          hasErr: false
+        });
+        setTotalTypedChars(0);
+        setCorrectTypedChars(0);
+        setStartTime(null);
+        setIncorrectWords({});
+        setCurrentIndex(0);
+        setWordCount(0);
+        setIsWordCorrect(true);
+        setTimer(60);
+        // setTimer(10);
+        setIsTimeFinished(false);
+
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
+        console.log('please refresh page');
+      });
+
+    // const newWords = generateWords();
+    // timeInterval = null;
+    // setCurrentChar(newWords.charAt(0));
+    // setIncomingChars(newWords.substr(1));
+    // setWordsArray([]);
+    // setCurrentObj({
+    //   strTyped: '',
+    //   hasErr: false
+    // });
+    // setTotalTypedChars(0);
+    // setCorrectTypedChars(0);
+    // setStartTime(null);
+    // setIncorrectWords({});
+    // setCurrentIndex(0);
+    // setWordCount(0);
+    // setIsWordCorrect(true);
+    // setTimer(60);
+    // // setTimer(10);
+    // setIsTimeFinished(false);
   };
 
   // Method to calculate time duration passed at a particular moment in the game.
