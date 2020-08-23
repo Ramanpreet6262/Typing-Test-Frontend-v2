@@ -4,6 +4,8 @@ A Typing Web App made using ReactJS to test your typing skills. It is a 1 min ga
 
 Also added user management(Login, Signup, Forget and Reset Password) in this version 2 by using AWS Cognito and AWS Amplify services. And a profile page to display statistics of recent tests taken by user.
 
+[Version 1](https://github.com/Ramanpreet6262/Typing-Test) can be found here!
+
 
 ## How to install
 
